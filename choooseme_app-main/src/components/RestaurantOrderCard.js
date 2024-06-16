@@ -5,29 +5,7 @@ import Separator from './Separator';
 import OrderService from '../services/OrderService';
 import UserService from '../services/UserService';
 
-const RestaurantOrderCard = ({ _id, tags, total, status, date, navigate }) => {
-  const [username, setUsername] = useState('');
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        let response = await UserService.getUserData();
-        let userData = response.data;
-        setUsername(userData.data.name);
-
-        let restaurantResponse = await OrderService.getOrderRestaurants({ username: userData.data.name });
-        if (restaurantResponse?.status) {
-          setRestaurants(restaurantResponse?.data?.orderRestaurants || []);
-        } else {
-          console.log('Order restaurants not found');
-        }
-      } catch (error) {
-        console.log('Error in fetching user data or order restaurants:', error);
-      }
-    };
-
-    getData();
-  }, []);
+const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate }) => {
 
   const handleCancelOrder = async () => {
     try {
@@ -36,7 +14,8 @@ const RestaurantOrderCard = ({ _id, tags, total, status, date, navigate }) => {
       Alert.alert('Error', 'Failed to cancel order');
     }
   };
-
+  
+  
   return (
     <View>
       <View style={styles.container}>
