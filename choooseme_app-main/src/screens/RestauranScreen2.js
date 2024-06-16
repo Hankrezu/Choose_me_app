@@ -1,64 +1,27 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  Image,
-  FlatList,
-} from 'react-native';
-import {CategoryListItem, FoodCard, Separator} from '../components';
-import {ApiContants, Colors, Fonts, Images} from '../contants';
-import {RestaurantService, StaticImageService} from '../services';
-import {Display} from '../utils';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, StatusBar, Image, FlatList } from 'react-native';
+import { CategoryListItem, FoodCard, Separator, BookmarkCard, ListItemSeparator } from '../components';
+import { ApiContants, Colors, Fonts, Images } from '../contants';
+import { RestaurantService, StaticImageService } from '../services';
+import { Display } from '../utils';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {useDispatch, useSelector} from 'react-redux';
-import {BookmarkAction} from '../actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { BookmarkAction } from '../actions';
 
 const ListHeader = () => (
-  <View
-    style={{
-      flexDirection: 'row',
-      flex: 1,
-      width: 40,
-      justifyContent: 'flex-end',
-    }}>
-    <View
-      style={{
-        backgroundColor: Colors.LIGHT_YELLOW,
-        width: 20,
-        borderTopLeftRadius: 64,
-        borderBottomLeftRadius: 64,
-      }}
-    />
+  <View style={{ flexDirection: 'row', flex: 1, width: 40, justifyContent: 'flex-end' }}>
+    <View style={{ backgroundColor: Colors.LIGHT_YELLOW, width: 20, borderTopLeftRadius: 64, borderBottomLeftRadius: 64 }} />
   </View>
 );
 
 const ListFooter = () => (
-  <View
-    style={{
-      flexDirection: 'row',
-      flex: 1,
-      width: 40,
-    }}>
-    <View
-      style={{
-        backgroundColor: Colors.LIGHT_YELLOW,
-        width: 20,
-        borderTopRightRadius: 64,
-        borderBottomRightRadius: 64,
-      }}
-    />
+  <View style={{ flexDirection: 'row', flex: 1, width: 40 }}>
+    <View style={{ backgroundColor: Colors.LIGHT_YELLOW, width: 20, borderTopRightRadius: 64, borderBottomRightRadius: 64 }} />
   </View>
 );
 
-const RestaurantScreen = ({
-  navigation,
-  route: {
-    params: {restaurantId, foodId},
-  },
-}) => {
+const RestaurantScreen2 = ({ navigation, route: { params: { restaurantId } } }) => {
   const [restaurant, setRestaurant] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -66,6 +29,7 @@ const RestaurantScreen = ({
     RestaurantService.getOneRestaurantById(restaurantId).then(response => {
       setSelectedCategory(response?.data?.categories[0]);
       setRestaurant(response?.data);
+      console.log(response?.data);
     });
   }, [restaurantId]);
 
@@ -77,15 +41,14 @@ const RestaurantScreen = ({
       )?.length > 0,
   );
   const addBookmark = () =>
-    dispatch(BookmarkAction.addBookmark({restaurantId}));
+    dispatch(BookmarkAction.addBookmark({ restaurantId }));
   const removeBookmark = () =>
-    dispatch(BookmarkAction.removeBookmark({restaurantId}));
-  const HighLightFood = restaurant?.foods?.filter(food => food._id === foodId);
+    dispatch(BookmarkAction.removeBookmark({ restaurantId }));
 
   const renderHeader = () => (
     <>
       <Image
-        source={{uri: restaurant?.images?.cover}}
+        source={{ uri: restaurant?.images?.cover }}
         style={styles.backgroundImage}
       />
       <Separator height={Display.setHeight(35)} />
@@ -121,26 +84,6 @@ const RestaurantScreen = ({
           </View>
         </View>
 
-        {HighLightFood?.length > 0 && (
-          <View style={styles.highlightFoodContainer}>
-            <FlatList
-              style={styles.HighlightFood}
-              data={HighLightFood}
-              keyExtractor={item => item._id}
-              renderItem={({item}) => (
-                <View style={styles.highlightFoodItem}>
-                  <FoodCard
-                    {...item}
-                    navigate={() =>
-                      navigation.navigate('Food', {foodId: item._id})
-                    }
-                  />
-                </View>
-              )}
-            />
-          </View>
-        )}
-
         <View style={styles.categoriesContainer}>
           <FlatList
             data={restaurant?.categories}
@@ -149,7 +92,7 @@ const RestaurantScreen = ({
             ListHeaderComponent={() => <ListHeader />}
             ListFooterComponent={() => <ListFooter />}
             showsHorizontalScrollIndicator={false}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <CategoryListItem
                 name={item}
                 isActive={item === selectedCategory}
@@ -162,11 +105,11 @@ const RestaurantScreen = ({
     </>
   );
 
-  const renderFoodItem = ({item}) => (
+  const renderFoodItem = ({ item }) => (
     <FoodCard
       key={item?._id}
       {...item}
-      navigate={() => navigation.navigate('Food', {foodId: item?._id})}
+      navigate={() => navigation.navigate('Food', { foodId: item?._id })}
     />
   );
 
@@ -283,4 +226,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RestaurantScreen;
+export default RestaurantScreen2;
