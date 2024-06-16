@@ -7,7 +7,88 @@ const getAllRestaurant = async () => {
   try {
     let restaurants = await MongoDB.db
       .collection(mongoConfig.collections.RESTAURANTS)
-      .find()
+      .aggregate([
+        {
+          $lookup: {
+            from: "foods",
+            let: { restaurantId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$restaurantId", { $toString: "$$restaurantId" }],
+                  },
+                },
+              },
+              {
+                $lookup: {
+                  from: "categories",
+                  let: { categoryIds: "$categories" },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $in: ["$_id", { $map: { input: "$$categoryIds", as: "categoryId", in: { $toObjectId: "$$categoryId" } } }]
+                        },
+                      },
+                    },
+                    {
+                      $project: {
+                        _id: 0,
+                        name: 1,
+                      },
+                    },
+                  ],
+                  as: "categoryNames",
+                },
+              },
+              {
+                $addFields: {
+                  categories: "$categoryNames.name",
+                },
+              },
+              {
+                $project: {
+                  categoryNames: 0,
+                },
+              },
+            ],
+            as: "foods",
+          },
+        },
+        {
+          $lookup: {
+            from: "categories",
+            let: { categoryIds: "$categories" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $in: ["$_id", { $map: { input: "$$categoryIds", as: "categoryId", in: { $toObjectId: "$$categoryId" } } }]
+                  },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  name: 1,
+                },
+              },
+            ],
+            as: "categoryNames",
+          },
+        },
+        {
+          $addFields: {
+            categories: "$categoryNames.name",
+          },
+        },
+        {
+          $project: {
+            categoryNames: 0,
+          },
+        },
+      ])
       .toArray();
 
     if (restaurants && restaurants?.length > 0) {

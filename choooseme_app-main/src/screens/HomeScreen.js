@@ -7,28 +7,28 @@ import {
   FlatList,
   PermissionsAndroid,
   Platform,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
 import {
   CategoryMenuItem,
   HomeFoodCard,
   Separator,
+  RestaurantCard, // Assuming you have this component
 } from '../components';
 import { Colors, Fonts } from '../contants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import { RestaurantService } from '../services';
 import { FoodService } from '../services';
 import { CategoryService } from '../services';
 import { Display } from '../utils';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 
-const sortStyle = isActive =>
-  isActive
-    ? styles.sortListItem
-    : { ...styles.sortListItem, borderBottomColor: Colors.DEFAULT_WHITE };
-
 const HomeScreen = ({ navigation }) => {
+  const [restaurants, setRestaurants] = useState(null);
   const [activeCategory, setActiveCategory] = useState();
   const [foods, setFoods] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -37,6 +37,8 @@ const HomeScreen = ({ navigation }) => {
   const [address, setAddress] = useState('Fetching address...');
   const [errorMessage, setErrorMessage] = useState(null);
   const [permissionGranted, setPermissionGranted] = useState(false);
+  const [activeTab, setActiveTab] = useState('foods'); // New state for tabs
+  const [modalVisible, setModalVisible] = useState(false); // New state for modal visibility
   const HERE_API_KEY = 'N1VJJkJ75nlrnW3wBWj2iLlQadWYpHRo990Ur6r_yME'; // Replace with your actual HERE API key
 
   useEffect(() => {
@@ -109,7 +111,7 @@ const HomeScreen = ({ navigation }) => {
     requestLocationPermission();
   }, []);
 
-  const truncate = (input) => input.length > 20? `${input.substring(0, 20)}...` : input;
+  const truncate = (input) => input.length > 20 ? `${input.substring(0, 20)}...` : input;
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -123,9 +125,37 @@ const HomeScreen = ({ navigation }) => {
           setCategories(response?.data);
         }
       });
+      RestaurantService.getRestaurants().then(response => {
+        if (response?.status) {
+          setRestaurants(response?.data);
+        }
+      });
     });
     return unsubscribe;
-  }, [navigation]);
+  }, []);
+
+  const filterItems = (category) => {
+    setActiveCategory(category);
+    if (category) {
+      const filteredFoods = foods.filter(food => food.categories.includes(category.name));
+      const filteredRestaurants = restaurants.filter(restaurant => restaurant.categories.includes(category.name));
+      setFoods(filteredFoods);
+      setRestaurants(filteredRestaurants);
+    } else {
+      // Fetch all foods and restaurants again if no category is selected
+      FoodService.getAllFoods().then(response => {
+        if (response?.status) {
+          setFoods(response?.data);
+        }
+      });
+      RestaurantService.getRestaurants().then(response => {
+        if (response?.status) {
+          setRestaurants(response?.data);
+        }
+      });
+    }
+    setModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -150,12 +180,14 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.searchText}>Search..</Text>
           </View>
 
-          <Feather
-            name="sliders"
-            size={20}
-            color={Colors.DEFAULT_YELLOW}
-            style={{ marginRight: 10 }}
-          />
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Feather
+              name="sliders"
+              size={20}
+              color={Colors.DEFAULT_YELLOW}
+              style={{ marginRight: 10 }}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.locationContainer}>
           <Ionicons
@@ -187,26 +219,95 @@ const HomeScreen = ({ navigation }) => {
           /> */}
         </View>
       </View>
-          
-      <View style={styles.horizontalListContainer}>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={foods}
-          keyExtractor={item => item?._id}
-          ListHeaderComponent={() => <Separator height={20} />}
-          ListFooterComponent={() => <Separator height={20} />}
-          ItemSeparatorComponent={() => <Separator height={10} />}
-          renderItem={({ item }) => (
-            <HomeFoodCard
-              {...item}
-              navigate={() =>
-                navigation.navigate('Restaurant', { restaurantId: item?.restaurantId, foodId : item?._id })
-              }
-            />
-          )}
-        />
+
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'foods' && styles.activeTab]}
+          onPress={() => setActiveTab('foods')}
+        >
+          <Text style={[styles.tabText, activeTab === 'foods' && styles.activeTabText]}>Foods</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'restaurants' && styles.activeTab]}
+          onPress={() => setActiveTab('restaurants')}
+        >
+          <Text style={[styles.tabText, activeTab === 'restaurants' && styles.activeTabText]}>Restaurants</Text>
+        </TouchableOpacity>
       </View>
+
+      <View style={styles.horizontalListContainer}>
+        {activeTab === 'foods' ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={foods}
+            keyExtractor={item => item?._id}
+            ListHeaderComponent={() => <Separator height={20} />}
+            ListFooterComponent={() => <Separator height={20} />}
+            ItemSeparatorComponent={() => <Separator height={10} />}
+            renderItem={({ item }) => (
+              <HomeFoodCard
+                {...item}
+                navigate={() =>
+                  navigation.navigate('Restaurant', { restaurantId: item?.restaurantId, foodId: item?._id })
+                }
+              />
+            )}
+          />
+        ) : (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={restaurants}
+            keyExtractor={item => item?._id}
+            ListHeaderComponent={() => <Separator height={20} />}
+            ListFooterComponent={() => <Separator height={20} />}
+            ItemSeparatorComponent={() => <Separator height={10} />}
+            renderItem={({ item }) => (
+              <RestaurantCard
+                {...item}
+                navigate={() =>
+                  navigation.navigate('Restaurant2', { restaurantId: item?._id })
+                }
+              />
+            )}
+          />
+        )}
+      </View>
+      
       <Separator height={Display.setHeight(5)} />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select Category</Text>
+            <FlatList
+              data={categories}
+              keyExtractor={item => item?._id}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.category} onPress={() => filterItems(item)}>
+                  <Text style={styles.categoryText}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+              ListHeaderComponent={() => (
+                <TouchableOpacity onPress={() => filterItems(null)}>
+                  <Text style={styles.categoryText}>All</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -297,9 +398,9 @@ const styles = StyleSheet.create({
     zIndex: -5,
   },
   horizontalListContainer: {
-    marginTop: 20,
+    marginTop: -18,
     marginLeft: '5%',
-    marginBottom: 190,
+    marginBottom: 280,
   },
   listHeader: {
     flexDirection: 'row',
@@ -341,6 +442,76 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 13 * 1.4,
     fontFamily: Fonts.POPPINS_SEMI_BOLD,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  tabItem: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.DEFAULT_YELLOW,
+  },
+  tabText: {
+    fontSize: 16,
+    color: Colors.DEFAULT_GREY,
+    fontFamily: Fonts.POPPINS_MEDIUM,
+  },
+  activeTabText: {
+    color: Colors.DEFAULT_BLACK,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    height:'60%',
+    backgroundColor: Colors.DEFAULT_WHITE,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.POPPINS_MEDIUM,
+    marginBottom: 20,
+  },
+  categoryText: {
+    fontSize: 15,
+    lineHeight: 15 * 1.4,
+    fontFamily: Fonts.POPPINS_MEDIUM,
+    color: Colors.PEACH,
+    marginTop: 0,
+    borderRadius: 15,
+    padding: 4,
+    paddingBottom:4,  
+    backgroundColor: Colors.DEFAULT_WHITE,
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: Colors.DEFAULT_YELLOW,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.POPPINS_MEDIUM,
+    color: Colors.DEFAULT_WHITE,
+  },
+  category: {
+    alignItems: 'center',
+    marginTop: 0,    
+    paddingLeft:4,
+    overflow: 'hidden', 
   },
 });
 

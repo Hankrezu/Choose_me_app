@@ -22,7 +22,7 @@ const BookmarkCard = ({_id, name, images, location, tags, navigate}) => {
         style={styles.remomveIcon}
         onPress={() => removeBookmark()}
       />
-      <TouchableOpacity activeOpacity={0.8} onPress={() => navigate(id)}>
+      <TouchableOpacity activeOpacity={0.8} onPress={() => navigate(_id)}>
         <Image
           source={{uri: images?.poster}}
           style={styles.posterStyle}
