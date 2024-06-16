@@ -1,7 +1,7 @@
-import {ApiContants} from '../contants';
+import { ApiContants } from '../contants';
 import axios from 'axios';
-import {authHeader} from '../utils/Generator';
-import {getToken} from '../Store';
+import { authHeader } from '../utils/Generator';
+import { getToken } from '../Store';
 
 const getOrders = async ({ username }) => {
   console.log('OrderService | getOrders');
@@ -10,7 +10,7 @@ const getOrders = async ({ username }) => {
       `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}`,
       {
         headers: authHeader(getToken()),
-        params: { username } // Pass username as query parameter
+        params: { username }, // Pass username as query parameter
       },
     );
     if (response?.status === 200) {
@@ -33,12 +33,12 @@ const getOrders = async ({ username }) => {
   }
 };
 
-const createOrder = async ({ username, restaurantId }) => {
+const createOrder = async ({ username, restaurantId, total }) => {
   console.log('OrderService | createOrder');
   try {
     let response = await axios.post(
       `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}/${username}`,
-      { restaurantId },
+      { restaurantId, total },
       {
         headers: authHeader(getToken()),
       },
@@ -46,20 +46,20 @@ const createOrder = async ({ username, restaurantId }) => {
     if (response?.status === 200) {
       return {
         status: true,
-        message: 'Item order successfully',
+        message: 'Order placed successfully',
         data: response?.data?.data,
       };
     } else {
       return {
         status: false,
-        message: 'Item order failed',
+        message: 'Order placement failed',
       };
     }
   } catch (error) {
     console.log(error?.response);
     return {
       status: false,
-      message: 'Item order failed',
+      message: 'Order placement failed',
     };
   }
 };
@@ -77,19 +77,19 @@ const removeCartItems = async ({ username, restaurantId }) => {
     if (response?.status === 200) {
       return {
         status: true,
-        message: 'Item removed from cart successfully',
+        message: 'Items removed from cart successfully',
         data: response?.data?.data,
       };
     } else {
       return {
         status: false,
-        message: 'Item removed from failed',
+        message: 'Failed to remove items from cart',
       };
     }
   } catch (error) {
     return {
       status: false,
-      message: 'Item removed from failed',
+      message: 'Failed to remove items from cart',
     };
   }
 };
@@ -123,4 +123,65 @@ const getOrderRestaurants = async ({ username }) => {
   }
 };
 
-export default { getOrders, createOrder, removeCartItems, getOrderRestaurants };
+const getOrderFoods = async ({ username, orderId }) => {
+  console.log('OrderService | getOrderFoods');
+  try {
+    let response = await axios.get(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}/foods/${username}/${orderId}`,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'Order foods fetched successfully',
+        data: response?.data?.data,
+        total: response?.data?.total, // Ensure total is included in the response
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Order foods not found',
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: 'Order foods fetch failed',
+    };
+  }
+};
+const cancelOrder = async ({ username, orderId }) => {
+  console.log('OrderService | cancelOrder');
+  try {
+    let response = await axios.patch(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}/cancel/${username}/${orderId}`,
+      null,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'Order canceled successfully',
+        data: response?.data?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Failed to cancel order',
+      };
+    }
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    return {
+      status: false,
+      message: 'Failed to cancel order',
+    };
+  }
+};
+
+
+export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder };

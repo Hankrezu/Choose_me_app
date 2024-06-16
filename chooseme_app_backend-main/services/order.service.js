@@ -1,7 +1,8 @@
 const { mongoConfig } = require("../config");
 const MongoDB = require("./mongodb.service");
+const { ObjectId } = require("mongodb");
 
-const createOrder = async ({ username, restaurantId }) => {
+const createOrder = async ({ username, restaurantId, total }) => {
   try {
     let cartItems = await MongoDB.db
       .collection(mongoConfig.collections.CARTS)
@@ -16,7 +17,9 @@ const createOrder = async ({ username, restaurantId }) => {
       username,
       restaurantId,
       cartItems,
+      total, // Store the total in the order
       createdAt: new Date(),
+      status: 'PENDING',  // Add status field with default value 'PENDING'
     };
 
     let result = await MongoDB.db
@@ -39,6 +42,7 @@ const createOrder = async ({ username, restaurantId }) => {
     };
   }
 };
+
 
 const removeCartItems = async ({ username, restaurantId }) => {
   try {
@@ -119,7 +123,9 @@ const getOrderRestaurants = async ({ username }) => {
             "restaurantId": 1,
             "createdAt": 1,
             "restaurants": 1,
-          },
+            "total": 1,  // Total
+            "status":1,  // Status of Order
+          }, 
         },
       ])
       .toArray();
@@ -142,16 +148,22 @@ const getOrderRestaurants = async ({ username }) => {
     console.error('Error fetching order restaurants:', error);
     return {
       status: false,
-      message: "Order Restaurants fetched failed",
+      message: "Order Restaurants fetch failed",
     };
   }
 };
 
-const getOrderCartItems = async ({ orderId, username }) => {
+const getOrderFoods = async ({ username, orderId }) => {
   try {
+    const orderObjectId = new ObjectId(orderId);
+
+    // Find the order
     let order = await MongoDB.db
       .collection(mongoConfig.collections.ORDERS)
-      .findOne({ _id: new ObjectId(orderId), username });
+      .findOne({
+        username: username,
+        _id: orderObjectId
+      });
 
     if (!order) {
       return {
@@ -160,37 +172,91 @@ const getOrderCartItems = async ({ orderId, username }) => {
       };
     }
 
-    let cartItems = order.cartItems;
-    let foodIds = cartItems.map(item => new ObjectId(item.foodId));
+    const foodIds = order.cartItems.map(item => new ObjectId(item.foodId));
+    const foodCounts = order.cartItems.reduce((acc, item) => {
+      acc[item.foodId] = item.count;
+      return acc;
+    }, {});
 
-    let foods = await MongoDB.db
+    // Fetch the food items corresponding to the foodIds in the order
+    let orderFoods = await MongoDB.db
       .collection(mongoConfig.collections.FOODS)
-      .find({ _id: { $in: foodIds } })
+      .find({
+        _id: { $in: foodIds }
+      })
+      .project({
+        "_id": 1,
+        "name": 1,
+        "price": 1,
+        "image": 1,
+        "categories": 1,
+        "description": 1,
+        "ingredients": 1,
+        "updatedAt": 1,
+      })
       .toArray();
 
-    let cartItemsWithFood = cartItems.map(item => {
-      let food = foods.find(food => food._id.equals(new ObjectId(item.foodId)));
+    // Add the count from cartItems to the fetched foods
+    orderFoods = orderFoods.map(food => {
+      const count = foodCounts[food._id.toString()];
       return {
-        ...item,
-        food: food,
+        ...food,
+        count, // Add count from the order's cartItems
       };
     });
 
-    return {
-      status: true,
-      message: "Cart items fetched successfully",
-      data: cartItemsWithFood,
-    };
+    if (orderFoods?.length > 0) {
+      return {
+        status: true,
+        message: "Order Foods fetched successfully",
+        data: orderFoods,
+        total: order.total // Include the total price from the order
+      };
+    } else {
+      return {
+        status: false,
+        message: "Order Foods not found",
+      };
+    }
   } catch (error) {
-    console.error('Error fetching cart items for order:', error);
+    console.error('Error fetching order foods:', error);
     return {
       status: false,
-      message: "Fetching cart items failed",
+      message: "Order Foods fetch failed",
       error,
     };
   }
 };
 
+const cancelOrder = async ({ username, orderId }) => {
+  try {
+    const orderObjectId = new ObjectId(orderId);
+    const result = await MongoDB.db
+      .collection(mongoConfig.collections.ORDERS)
+      .updateOne(
+        { _id: orderObjectId, username, status: 'PENDING' },
+        { $set: { status: 'CANCELLED' } }
+      );
 
-module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderCartItems };
+    if (result.modifiedCount > 0) {
+      return {
+        status: true,
+        message: "Order canceled successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "Order cancellation failed or order was not in PENDING status",
+      };
+    }
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    return {
+      status: false,
+      message: "Order cancellation failed",
+      error,
+    };
+  }
+};
 
+module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder };

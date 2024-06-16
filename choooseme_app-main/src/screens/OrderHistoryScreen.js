@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  FlatList,
-  Image, // Import Image component
-} from 'react-native';
+View,
+Text,
+StyleSheet,
+StatusBar,
+FlatList,
+Image, // Import Image component
+TouchableOpacity
+} from 'react-native';``
 import { Colors, Fonts } from '../contants';
 import { Separator, RestaurantCart,RestaurantOrderCard } from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -16,30 +17,33 @@ import { OrderService } from '../services';
 
 const ListItemSeparator = () => (
   <View
-    style={{
-      height: 0.8,
-      backgroundColor: Colors.DEFAULT_GREY,
-      width: '100%',
-      marginVertical: 10,
-    }}
+  style={{
+  height: 0.8,
+  backgroundColor: Colors.DEFAULT_GREY,
+  width: '100%',
+  marginVertical: 10,
+  }}
   />
-);
+  );
 
 const OrderHistoryScreen = ({ navigation }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [username, setUsername] = useState('');
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [oncomingOrders, setOncomingOrders] = useState([]);
+  const [cancelledOrders, setCancelledOrders] = useState([]);
+  const [deliveredOrders, setDeliveredOrders] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
-      try { 
-        let response = await UserService.getUserData();  
+      try {
+        let response = await UserService.getUserData();
         let userData = response.data;
         setUsername(userData.data.name);
 
-        // Fetch order restaurants only after getting the username
         let restaurantResponse = await OrderService.getOrderRestaurants({ username: userData.data.name });
         if (restaurantResponse?.status) {
-          setRestaurants(restaurantResponse?.data?.orderRestaurants|| []);
+          setRestaurants(restaurantResponse?.data?.orderRestaurants || []);
         } else {
           console.log('Order restaurants not found');
         }
@@ -69,22 +73,97 @@ const OrderHistoryScreen = ({ navigation }) => {
     return unsubscribe;
   }, [navigation, username]);
 
-  const keyExtractor = (item, index) => {
-    if (item && item._id) {
-      return `${item._id}_${index}`;
+  useEffect(() => {
+    // Categorize orders based on status
+    const categorizeOrders = () => {
+      const pending = [];
+      const oncoming = [];
+      const cancelled = [];
+      const delivered = [];
+
+      restaurants.forEach(item => {
+        switch (item.status) {
+          case 'PENDING':
+            pending.push(item);
+            break;
+          case 'ONCOMING':
+            oncoming.push(item);
+            break;
+          case 'CANCELLED':
+            cancelled.push(item);
+            break;
+          case 'DELIVERED':
+            delivered.push(item);
+            break;
+          default:
+            break;
+        }
+      });
+
+      setPendingOrders(pending);
+      setOncomingOrders(oncoming);
+      setCancelledOrders(cancelled);
+      setDeliveredOrders(delivered);
+    };
+
+    categorizeOrders();
+  }, [restaurants]);
+
+  const keyExtractor = (item, index) => `${item._id}_${index}`;
+
+  const renderOrderList = (data) => (
+    <FlatList
+      style={styles.RestaurantCartList}
+      data={data}
+      keyExtractor={keyExtractor}
+      showsVerticalScrollIndicator={false}
+      ListHeaderComponent={() => <Separator height={10} />}
+      ListFooterComponent={() => <Separator height={10} />}
+      ItemSeparatorComponent={() => <ListItemSeparator />}
+      renderItem={({ item }) => (
+        <RestaurantOrderCard
+          _id={item._id}
+          name={item.restaurants.name}
+          images={item.restaurants.images}
+          location={item.restaurants.location}
+          date={item.createdAt}
+          total={item.total}
+          status={item.status}
+          navigate={() => navigation.navigate('Order', { orderId: item._id })}
+        />
+      )}
+    />
+  );
+
+  const TabButton = ({ title, onPress, isActive }) => (
+    <TouchableOpacity
+      style={[styles.tabButton, isActive && styles.activeTabButton]}
+      onPress={onPress}
+    >
+      <Text style={styles.tabButtonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'PENDING':
+        return renderOrderList(pendingOrders);
+      case 'ONCOMING':
+        return renderOrderList(oncomingOrders);
+      case 'CANCELLED':
+        return renderOrderList(cancelledOrders);
+      case 'DELIVERED':
+        return renderOrderList(deliveredOrders);
+      default:
+        return null;
     }
-    return `${index}`;
   };
 
-  console.log(restaurants)
+  const [activeTab, setActiveTab] = useState('PENDING');
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.PEACH}
-        translucent
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.PEACH} translucent />
       <Separator height={StatusBar.currentHeight} />
       <View style={styles.headerContainer}>
         <Ionicons
@@ -94,52 +173,34 @@ const OrderHistoryScreen = ({ navigation }) => {
         />
         <Text style={styles.headerTitle}>Order History</Text>
       </View>
-      <View>
-        <FlatList
-          style={styles.RestaurantCartList}
-          data={restaurants}
-          keyExtractor={keyExtractor}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={() => <Separator height={10} />}
-          ListFooterComponent={() => <Separator height={10} />}
-          ItemSeparatorComponent={() => <ListItemSeparator />}
-          renderItem={({ item }) => (
-            <View>
-              <RestaurantOrderCard
-                _id={item._id}
-                name={item.restaurants.name}
-                images={item.restaurants.images} // Pass the images prop
-                location={item.restaurants.location}
-                date={item.createdAt}
-                navigate={() => navigation.navigate('Order', { orderId: item._id })}
-              />
-            </View>
-          )}
+      <View style={styles.tabContainer}>
+        <TabButton
+          title="Pending"
+          onPress={() => setActiveTab('PENDING')}
+          isActive={activeTab === 'PENDING'}
+        />
+        <TabButton
+          title="Oncoming"
+          onPress={() => setActiveTab('ONCOMING')}
+          isActive={activeTab === 'ONCOMING'}
+        />
+        <TabButton
+          title="Cancelled"
+          onPress={() => setActiveTab('CANCELLED')}
+          isActive={activeTab === 'CANCELLED'}
+        />
+        <TabButton
+          title="Delivered"
+          onPress={() => setActiveTab('DELIVERED')}
+          isActive={activeTab === 'DELIVERED'}
         />
       </View>
+      {renderTabContent()}
     </View>
   );
 };
+
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  upper: { height: 100, backgroundColor: '#DDD', opacity: 0.5 },
-  lower: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    height: Display.setHeight(30),
-    width: Display.setWidth(90)
-  },
-  hideText: {
-    fontSize: 50,
-    color: 'white'
-  },
   container: {
     flex: 1,
     backgroundColor: Colors.DEFAULT_WHITE,
@@ -149,134 +210,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: Colors.PEACH
+    backgroundColor: Colors.PEACH,
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: Fonts.POPPINS_MEDIUM,
     lineHeight: 20 * 1.4,
-    width: Display.setWidth(80),
+    width: '80%',
     textAlign: 'center',
   },
-  foodList: {
-    marginHorizontal: Display.setWidth(4),
-  },
-  promoCodeContainer: {
+  tabContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: Display.setWidth(4),
-    paddingVertical: 15,
-    marginTop: 10,
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+    backgroundColor: Colors.LIGHT_GREY,
+    paddingVertical: 10,
   },
-  promoCodeText: {
-    fontSize: 15,
-    fontFamily: Fonts.POPPINS_MEDIUM,
-    lineHeight: 15 * 1.4,
-    color: Colors.DEFAULT_BLACK,
-    marginLeft: 10,
-  },
-  rowAndCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  amountContainer: {
-    marginHorizontal: Display.setWidth(4),
-    paddingVertical: 20,
-    borderBottomWidth: 0.5,
-  },
-  amountSubContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 3,
-  },
-  amountLabelText: {
-    fontSize: 15,
-    fontFamily: Fonts.POPPINS_SEMI_BOLD,
-    lineHeight: 15 * 1.4,
-    color: Colors.DEFAULT_GREEN,
-  },
-  amountText: {
-    fontSize: 15,
-    fontFamily: Fonts.POPPINS_SEMI_BOLD,
-    lineHeight: 15 * 1.4,
-    color: Colors.DEFAULT_BLACK,
-  },
-  totalContainer: {
-    marginHorizontal: Display.setWidth(4),
-    paddingVertical: 15,
-    borderBottomWidth: 0.5,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  totalText: {
-    fontSize: 20,
-    fontFamily: Fonts.POPPINS_SEMI_BOLD,
-    lineHeight: 20 * 1.4,
-    color: Colors.DEFAULT_BLACK,
-  },
-  checkoutButton: {
-    flexDirection: 'row',
-    width: Display.setWidth(80),
-    backgroundColor: Colors.DEFAULT_GREEN,
-    alignSelf: 'center',
+  tabButton: {
     paddingHorizontal: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderRadius: 10,
-    height: Display.setHeight(7),
-    marginTop: 10,
+    paddingVertical: 10,
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
   },
-  checkoutText: {
+  activeTabButton: {
+    borderBottomColor: Colors.PEACH,
+  },
+  tabButtonText: {
     fontSize: 16,
     fontFamily: Fonts.POPPINS_MEDIUM,
-    lineHeight: 16 * 1.4,
-    color: Colors.DEFAULT_WHITE,
-    marginLeft: 8,
+    color: Colors.DEFAULT_BLACK,
   },
-  emptyCartContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyCartText: {
-    fontSize: 30,
-    fontFamily: Fonts.POPPINS_LIGHT,
-    lineHeight: 30 * 1.4,
-    color: Colors.DEFAULT_GREEN,
-  },
-  emptyCartSubText: {
-    fontSize: 12,
-    fontFamily: Fonts.POPPINS_MEDIUM,
-    lineHeight: 12 * 1.4,
-    color: Colors.INACTIVE_GREY,
-  },
-  addButtonEmpty: {
-    flexDirection: 'row',
-    backgroundColor: Colors.DEFAULT_YELLOW,
-    borderRadius: 8,
-    paddingHorizontal: Display.setWidth(4),
-    paddingVertical: 5,
-    marginTop: 10,
-    justifyContent: 'space-evenly',
-    elevation: 3,
-    alignItems: 'center',
-  },
-  addButtonEmptyText: {
-    fontSize: 12,
-    fontFamily: Fonts.POPPINS_MEDIUM,
-    lineHeight: 12 * 1.4,
-    color: Colors.DEFAULT_WHITE,
-    marginLeft: 10,
-  },
-  emptyCartImage: {
-    height: Display.setWidth(60),
-    width: Display.setWidth(60),
-  },
-  RestaurantCartList:{
+  RestaurantCartList: {
     marginHorizontal: 15,
   },
 });

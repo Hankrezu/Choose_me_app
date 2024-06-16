@@ -1,11 +1,11 @@
 var express = require("express");
-const { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderCartItems } = require("../services/order.service");
+const { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder } = require("../services/order.service");
 var router = express.Router();
 
 router.post("/:username", async (req, res) => {
   let { username } = req.params;
-  let { restaurantId } = req.body;
-  let response = await createOrder({ username, restaurantId });
+  let { restaurantId, total } = req.body;
+  let response = await createOrder({ username, restaurantId, total });
   res.json(response);
 });
 
@@ -28,10 +28,14 @@ router.get("/restaurants/:username", async (req, res) => {
   res.json(response);
 });
 
-// New route to get cart items with food details by order ID and username
-router.get("/cartItems/:orderId/:username", async (req, res) => {
-  let { orderId, username } = req.params;
-  let response = await getOrderCartItems({ orderId, username });
+router.get("/foods/:username/:orderId", async (req, res) => {
+  let { username, orderId } = req.params;
+  let response = await getOrderFoods({ username, orderId });
+  res.json(response);
+});
+router.patch("/cancel/:username/:orderId", async (req, res) => {
+  let { username, orderId } = req.params;
+  let response = await cancelOrder({ username, orderId });
   res.json(response);
 });
 

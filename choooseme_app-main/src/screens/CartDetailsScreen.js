@@ -81,10 +81,11 @@ const CartDetailsScreen = ({ navigation, route: { params: { restaurantId } } }) 
 
   const handleCheckout = async () => {
     try {
-      const response = await OrderService.createOrder({ username,restaurantId });
+      const total = cartItemsByRestaurant?.metaData?.grandTotal;
+      const response = await OrderService.createOrder({ username, restaurantId, total });
       console.log(response)
       if (response.status) {
-        await OrderService.removeCartItems({ username,restaurantId });
+        await OrderService.removeCartItems({ username, restaurantId });
         navigation.goBack();
       } else {
         Alert.alert("Order Error", response.message);
@@ -94,6 +95,7 @@ const CartDetailsScreen = ({ navigation, route: { params: { restaurantId } } }) 
       Alert.alert("Checkout Error", "There was an error processing your checkout. Please try again.");
     }
   };
+  
 
   return (
     <View style={styles.container}>
