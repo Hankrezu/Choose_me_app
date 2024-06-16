@@ -19,6 +19,7 @@ const ListItemSeparator = () => (
 
 const BookmarkScreen = ({navigation}) => {
   const bookmarks = useSelector(state => state?.bookmarkState?.bookmarks);
+  console.log(bookmarks)
   return (
     <View style={styles.container}>
       <StatusBar
@@ -38,7 +39,7 @@ const BookmarkScreen = ({navigation}) => {
       <FlatList
       style={styles.bookmarkList}
       data={bookmarks}
-      keyExtractor={item => item?._id}
+      keyExtractor={item => item?.restaurantId}
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={() => <Separator height={10} />}
       ListFooterComponent={() => <Separator height={10} />}
@@ -47,7 +48,7 @@ const BookmarkScreen = ({navigation}) => {
         <BookmarkCard
           {...item.restaurant}
           navigate={() =>
-            navigation.navigate('Restaurant', { restaurantId: item.restaurant._id, foodId:'0000'})
+            navigation.navigate('Restaurant2', { restaurantId: item?.restaurant._id})
           }
         />
       )}

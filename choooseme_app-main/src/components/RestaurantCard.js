@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {BookmarkAction} from '../actions';
 
 const RestaurantCard = ({
-  id,
+  _id,
   name,
   images: {poster},
   tags,
@@ -19,18 +19,18 @@ const RestaurantCard = ({
   const dispatch = useDispatch();
   const isBookmarked = useSelector(
     state =>
-      state?.bookmarkState?.bookmarks?.filter(item => item?.restaurantId === id)
+      state?.bookmarkState?.bookmarks?.filter(item => item?.restaurantId === _id)
         ?.length > 0,
   );
   const addBookmark = () =>
-    dispatch(BookmarkAction.addBookmark({restaurantId: id}));
+    dispatch(BookmarkAction.addBookmark({restaurantId: _id}));
   const removeBookmark = () =>
-    dispatch(BookmarkAction.removeBookmark({restaurantId: id}));
+    dispatch(BookmarkAction.removeBookmark({restaurantId: _id}));
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.8}
-      onPress={() => navigate(id)}>
+      onPress={() => navigate(_id)}>
       <Ionicons
         name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
         color={Colors.DEFAULT_YELLOW}
@@ -43,10 +43,9 @@ const RestaurantCard = ({
         style={styles.posterStyle}
       />
       <Text style={styles.titleText}>{name}</Text>
-      <Text style={styles.tagText}>{tags?.join(' • ')}</Text>
       <View style={styles.footerContainer}>
         <View style={styles.rowAndCenter}>
-          <FontAwesome name="star" size={14} color={Colors.DEFAULT_YELLOW} />
+          <FontAwesome name="star" size={14} color={Colors.PEACH} />
           <Text style={styles.ratingText}>4</Text>
           <Text style={styles.reviewsText}>({10})</Text>
         </View>
