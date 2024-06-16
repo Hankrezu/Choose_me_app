@@ -40,7 +40,6 @@ const FoodScreen = ({
 
   useEffect(() => {
     FoodService.getOneFoodById(foodId).then(response => {
-      console.log(response?.data);
       setFood(response?.data);
     });
   }, []);

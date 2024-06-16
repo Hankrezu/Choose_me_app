@@ -1,14 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {ApiContants, Colors, Fonts} from '../contants';
-import {StaticImageService} from '../services';
-import {Display} from '../utils';
-import {useDispatch} from 'react-redux';
-import {useSelector} from 'react-redux';
+import {Colors, Fonts} from '../contants';
+import {useDispatch, useSelector} from 'react-redux';
 import {CartAction} from '../actions';
 
-const FoodCard = ({_id, name, description,restaurantId, price, image, navigate}) => {
+const FoodCard = ({_id, name, description, restaurantId, price, image, count, navigate}) => {
   const dispatch = useDispatch();
   const itemCount = useSelector(
     state =>
@@ -39,24 +36,29 @@ const FoodCard = ({_id, name, description,restaurantId, price, image, navigate})
         <View style={styles.footerContainer}>
           <Text style={styles.priceText}> {price} đ</Text>
           <View style={styles.itemAddContainer}>
-            {itemCount > 0 ? (
+            {count ? (
+              <Text style={styles.itemCountText}>{count}</Text>
+            ) : (
               <>
+                {itemCount > 0 ? (
+                  <>
+                    <AntDesign
+                      name="minus"
+                      color={Colors.DEFAULT_YELLOW}
+                      size={18}
+                      onPress={() => removeFromCart(_id)}
+                    />
+                    <Text style={styles.itemCountText}>{itemCount}</Text>
+                  </>
+                ) : null}
                 <AntDesign
-                  name="minus"
+                  name="plus"
                   color={Colors.DEFAULT_YELLOW}
                   size={18}
-                  onPress={() => removeFromCart(_id)}
+                  onPress={() => addToCart(_id, restaurantId)}
                 />
-                <Text style={styles.itemCountText}>{itemCount}</Text>
               </>
-            ) : null}
-
-            <AntDesign
-              name="plus"
-              color={Colors.DEFAULT_YELLOW}
-              size={18}
-              onPress={() => addToCart(_id, restaurantId)}
-            />
+            )}
           </View>
         </View>
       </View>
@@ -81,10 +83,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   detailsContainer: {
+    flex: 1,
     marginHorizontal: 5,
   },
   titleText: {
-    width: Display.setWidth(60),
+    width: '60%',
     color: Colors.DEFAULT_BLACK,
     fontFamily: Fonts.POPPINS_BOLD,
     fontSize: 13,
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   descriptionText: {
-    width: Display.setWidth(60),
+    width: '60%',
     color: Colors.DEFAULT_GREY,
     fontFamily: Fonts.POPPINS_SEMI_BOLD,
     fontSize: 10,
@@ -118,6 +121,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
+    marginLeft: 'auto', // Align to the left
   },
   itemCountText: {
     color: Colors.DEFAULT_BLACK,

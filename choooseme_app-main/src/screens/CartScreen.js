@@ -38,7 +38,6 @@ const CartScreen = ({ navigation }) => {
     });
     return unsubscribe;
   }, [navigation]);
-  console.log(restaurants)
 
   const getUniqueRestaurants = (cartItems) => {
     const restaurantMap = new Map(); // Sử dụng Map để lưu trữ các nhà hàng duy nhất

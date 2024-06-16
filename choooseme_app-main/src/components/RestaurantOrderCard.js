@@ -1,76 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Colors, Fonts } from '../contants';
-import { StaticImageService } from '../services';
-import { useDispatch } from 'react-redux';
-import { BookmarkAction } from '../actions';
 import Separator from './Separator';
-import CartService from '../services/CartService';
+import OrderService from '../services/OrderService';
+import UserService from '../services/UserService';
 
-const RestaurantOrderCard = ({ _id, name, images, location, tags, date ,navigate }) => {
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+const RestaurantOrderCard = ({ _id, tags, total, status, date, navigate }) => {
+  const [username, setUsername] = useState('');
 
-//   useEffect(() => {
-//     const fetchCartItems = async () => {
-//       const response = await CartService.getCartItemsByRestaurant(_id);
-//       if (response.status) {
-//         const itemsCount = response.data.cartItems.reduce((total, item) => total + item.count, 0);
-//         const priceTotal = response.data.cartItems.reduce((total, item) => total + (item.count * item.food.price), 0);
-//         setTotalItems(itemsCount);
-//         setTotalPrice(priceTotal);
-//       }
-//     };
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        let response = await UserService.getUserData();
+        let userData = response.data;
+        setUsername(userData.data.name);
 
-//     fetchCartItems();
-//   }, [_id]);
-  console.log(_id)
+        let restaurantResponse = await OrderService.getOrderRestaurants({ username: userData.data.name });
+        if (restaurantResponse?.status) {
+          setRestaurants(restaurantResponse?.data?.orderRestaurants || []);
+        } else {
+          console.log('Order restaurants not found');
+        }
+      } catch (error) {
+        console.log('Error in fetching user data or order restaurants:', error);
+      }
+    };
+
+    getData();
+  }, []);
+
+  const handleCancelOrder = async () => {
+    try {
+      const response = await OrderService.cancelOrder({ username: username, orderId: _id });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to cancel order');
+    }
+  };
+
   return (
     <View>
       <View style={styles.container}>
         <TouchableOpacity activeOpacity={0.8} onPress={() => navigate(_id)}>
-        <View style={styles.labelContainer}>
-          <Text style={styles.titleText}>Id Order: {_id}</Text>
-          <Text style={styles.tagText}>{tags?.slice(0, 3).join(' • ')}</Text>
-          <View style={styles.buttonLabelRow}>
-            <View style={styles.rowAndCenter}>
-              <Text style={styles.ratingText}>Total Price: {totalPrice} đ</Text>
+          <View style={styles.labelContainer}>
+            <Text style={styles.titleText}>Id Order: {_id}</Text>
+            <Text style={styles.tagText}>{tags?.slice(0, 3).join(' • ')}</Text>
+            <View style={styles.buttonLabelRow}>
+              <View style={styles.rowAndCenter}>
+                <Text style={styles.ratingText}>Total Price: {total} đ</Text>
+              </View>
+            </View>
+            <View>
+              <Text style={styles.ratingText}>Date: {date}</Text>
+            </View>
+            <View>
+              <Text style={styles.ratingText}>Status: {status}</Text>
             </View>
           </View>
-          <View>
-              <Text style={styles.ratingText}>Date: {date}</Text>
-          </View>
-        </View>
-        </TouchableOpacity>  
+        </TouchableOpacity>
+        {status === 'PENDING' && (
+          <TouchableOpacity style={styles.button} onPress={handleCancelOrder}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        {(status === 'CANCELLED' || status === 'DELIVERED') && (
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Buy Again</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <Separator height={5} />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.DEFAULT_WHITE,
   },
-  posterStyle: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    margin: 5,
-  },
-  remomveIcon: {
-    position: 'absolute',
-    zIndex: 5,
-    top: 0,
-    right: 0,
-  },
   labelContainer: {
     flex: 1,
     paddingHorizontal: 10,
-    
   },
   titleText: {
     fontSize: 15,
@@ -90,14 +100,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  locationText: {
-    fontSize: 11,
-    lineHeight: 11 * 1.4,
-    fontFamily: Fonts.POPPINS_MEDIUM,
-    color: Colors.DEFAULT_GREY,
-    marginBottom: 5,
-    marginLeft: 5,
-  },
   ratingText: {
     fontSize: 12,
     lineHeight: 12 * 1.4,
@@ -109,6 +111,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 'auto',
+    borderWidth: 1,
+    backgroundColor: Colors.PEACH,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  buttonText: {
+    fontSize: 15,
+    fontFamily: Fonts.POPPINS_MEDIUM,
   },
 });
 
