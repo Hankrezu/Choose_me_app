@@ -5,6 +5,8 @@ import {
   StyleSheet,
   StatusBar,
   FlatList,
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 import { Colors, Fonts, Images } from '../contants';
 import { Separator, BookmarkCard,RestaurantCart, } from '../components';
@@ -51,6 +53,30 @@ const CartScreen = ({ navigation }) => {
     });
     return Array.from(restaurantMap.values()); // Chuyển đổi Map thành mảng và trả về các giá trị duy nhất
   };
+
+  const handleClearAll = () => {
+    Alert.alert(
+      "Clear Cart",
+      "Are you sure you want to clear all items in the cart?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "OK",
+          onPress: () => {
+            CartService.removeAllCart().then(response => {
+              if (response?.status) {
+                setRestaurants([]);
+              } else {
+                console.log('Failed to clear cart:', response.message);
+              }
+            }).catch(error => {
+              console.log('Error in CartService.removeAllCart:', error);
+            });
+          }
+        }
+      ]
+    );
+  };
   
   return (
     <View style={styles.container}>
@@ -69,6 +95,9 @@ const CartScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Cart</Text>
       </View>
       <View>
+      <TouchableOpacity onPress={handleClearAll} >
+        <Text style={styles.headerFuction} >Clear All</Text>
+      </TouchableOpacity>
       <FlatList
         style={styles.RestaurantCartList}
         data={restaurants}
@@ -249,6 +278,15 @@ const styles = StyleSheet.create({
   },
   RestaurantCartList:{
     marginHorizontal: 15,
+  },
+  headerFuction:{
+    fontSize: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop:5,
+    marginRight:15,
+    marginLeft:'auto',
   },
 });
 

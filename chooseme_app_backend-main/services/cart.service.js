@@ -242,4 +242,63 @@ const getCartItemsByRestaurant = async ({ username, restaurantId }) => {
 };
 
 
-module.exports = { addToCart, removeFromCart, getCartItems,getCartRestaurant,getCartItemsByRestaurant };
+const removeAllCart = async ({ username }) => {
+  try {
+    let deletedCart = await MongoDB.db
+      .collection(mongoConfig.collections.CARTS)
+      .deleteMany({ username });
+    if (deletedCart?.deletedCount > 0) {
+      return {
+        status: true,
+        message: "All Cart items removed successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "No Cart items found to remove",
+      };
+    }
+  } catch (error) {
+    console.error('Error removing all cart items:', error);
+    return {
+      status: false,
+      message: "Failed to remove all cart items",
+    };
+  }
+};
+
+const removeOneCart = async ({ username, restaurantId }) => {
+  try {
+    let deletedCart = await MongoDB.db
+      .collection(mongoConfig.collections.CARTS)
+      .deleteMany({ username, restaurantId });
+    if (deletedCart?.deletedCount > 0) {
+      return {
+        status: true,
+        message: "Cart items for the restaurant removed successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "No Cart items found to remove for the restaurant",
+      };
+    }
+  } catch (error) {
+    console.error('Error removing cart items by restaurant:', error);
+    return {
+      status: false,
+      message: "Failed to remove cart items for the restaurant",
+    };
+  }
+};
+
+module.exports = { 
+  addToCart, 
+  removeFromCart, 
+  getCartItems, 
+  getCartRestaurant, 
+  getCartItemsByRestaurant,
+  removeAllCart,
+  removeOneCart 
+};
+

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Colors, Fonts } from '../contants';
 import Separator from './Separator';
 import OrderService from '../services/OrderService';
-import UserService from '../services/UserService';
 
 const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate }) => {
 
@@ -14,7 +13,6 @@ const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate
       Alert.alert('Error', 'Failed to cancel order');
     }
   };
-  
   
   return (
     <View>

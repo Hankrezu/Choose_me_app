@@ -155,4 +155,72 @@ const getCartItemsByRestaurant = async (restaurantId) => {
 };
 
 
-export default {getCartItems, addToCart, removeFromCart, getCartRestaurant, getCartItemsByRestaurant};
+const removeAllCart = async () => {
+  console.log('CartService | removeAllCart');
+  try {
+    let response = await axios.delete(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.CART}`,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'All items removed from cart successfully',
+        data: response?.data?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Failed to remove items from cart',
+      };
+    }
+  } catch (error) {
+    console.error('Error in removeAllCart:', error?.response || error);
+    return {
+      status: false,
+      message: 'Failed to remove items from cart',
+    };
+  }
+};
+
+const removeOneCart = async (restaurantId) => {
+  console.log('CartService | removeCart');
+  try {
+    let response = await axios.delete(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.CART}/restaurant/${restaurantId}`,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'Items removed from cart successfully',
+        data: response?.data?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Failed to remove items from cart',
+      };
+    }
+  } catch (error) {
+    console.error('Error in removeCart:', error?.response || error);
+    return {
+      status: false,
+      message: 'Failed to remove items from cart',
+    };
+  }
+};
+
+export default {
+  getCartItems,
+  addToCart,
+  removeFromCart,
+  getCartRestaurant,
+  getCartItemsByRestaurant,
+  removeAllCart,
+  removeOneCart
+};
