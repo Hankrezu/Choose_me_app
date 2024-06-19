@@ -124,11 +124,10 @@ const OrderHistoryScreen = ({ navigation }) => {
         <RestaurantOrderCard
           _id={item._id}
           name={item.restaurants.name}
-          images={item.restaurants.images}
-          location={item.restaurants.location}
           date={item.createdAt}
           total={item.total}
           status={item.status}
+          username={item.username}
           navigate={() => navigation.navigate('Order', { orderId: item._id })}
         />
       )}
@@ -160,7 +159,6 @@ const OrderHistoryScreen = ({ navigation }) => {
   };
 
   const [activeTab, setActiveTab] = useState('PENDING');
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.PEACH} translucent />

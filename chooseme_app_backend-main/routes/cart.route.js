@@ -4,7 +4,9 @@ const {
   removeFromCart,
   getCartItems,
   getCartRestaurant,
-  getCartItemsByRestaurant
+  getCartItemsByRestaurant,
+  removeAllCart,
+  removeOneCart
 } = require("../services/cart.service");
 var router = express.Router();
 
@@ -42,5 +44,18 @@ router.get("/:restaurantId", async (req, res) => {
   res.json(response);
 });
 
+// New Routes
+router.delete("/", async (req, res) => {
+  let username = req?.username;
+  let response = await removeAllCart({ username });
+  res.json(response);
+});
+
+router.delete("/restaurant/:restaurantId", async (req, res) => {
+  let { restaurantId } = req.params;
+  let username = req?.username;
+  let response = await removeOneCart({ username, restaurantId });
+  res.json(response);
+});
 
 module.exports = router;

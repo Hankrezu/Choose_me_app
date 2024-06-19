@@ -28,16 +28,27 @@ const RestaurantCart = ({ _id, name, images, location, tags, navigate }) => {
     fetchCartItems();
   }, [_id]);
 
+  const handleRemoveOneCart = async () => {
+    const response = await CartService.removeOneCart(_id);
+    if (response.status) {
+      setTotalItems(0);
+      setTotalPrice(0);
+    } else {
+      // Handle error, optionally show a message to the user
+      console.error("Failed to remove cart items");
+    }
+  };
+
   return (
     <View>
       <View style={styles.container}>
-        {/* <Ionicons
+        <Ionicons
           name="close-circle"
           color={Colors.DEFAULT_GREY}
           size={22}
           style={styles.remomveIcon}
-          onPress={() => removeBookmark()}
-        /> */}
+          onPress={handleRemoveOneCart}
+        />
         <TouchableOpacity activeOpacity={0.8} onPress={() => navigate(_id)}>
           <Image source={{ uri: images?.poster }} style={styles.posterStyle} />
         </TouchableOpacity>
