@@ -4,7 +4,7 @@ import { Colors, Fonts } from '../contants';
 import Separator from './Separator';
 import OrderService from '../services/OrderService';
 
-const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate }) => {
+const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, date, navigate }) => {
 
   const handleCancelOrder = async () => {
     try {
@@ -13,7 +13,22 @@ const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate
       Alert.alert('Error', 'Failed to cancel order');
     }
   };
-  
+
+  const handleReOrder = async () => {
+    try {
+      const response = await OrderService.reOrder({ username, orderId: _id });
+      if (response.status) {
+        Alert.alert('Success', 'Order placed successfully', [
+          { text: 'OK'}
+        ]);
+      } else {
+        Alert.alert('Error', response.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to place order');
+    }
+  };
+
   return (
     <View>
       <View style={styles.container}>
@@ -40,7 +55,7 @@ const RestaurantOrderCard = ({ _id, tags, total, status,username, date, navigate
           </TouchableOpacity>
         )}
         {(status === 'CANCELLED' || status === 'DELIVERED') && (
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleReOrder}>
             <Text style={styles.buttonText}>Buy Again</Text>
           </TouchableOpacity>
         )}

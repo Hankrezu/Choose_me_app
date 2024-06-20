@@ -184,4 +184,35 @@ const cancelOrder = async ({ username, orderId }) => {
 };
 
 
-export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder };
+const reOrder = async ({ username, orderId }) => {
+  console.log('OrderService | reOrder');
+  try {
+    let response = await axios.post(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}/reorder/${username}/${orderId}`,
+      null,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'Reorder successful',
+        data: response?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Reorder failed',
+      };
+    }
+  } catch (error) {
+    console.error('Error reordering:', error);
+    return {
+      status: false,
+      message: 'Reorder failed',
+    };
+  }
+};
+
+export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder };

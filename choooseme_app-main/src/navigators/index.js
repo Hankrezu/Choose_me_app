@@ -26,6 +26,8 @@ import HomeTabs from './BottomTabs';
 import {useSelector, useDispatch} from 'react-redux';
 import {GeneralAction} from '../actions';
 
+
+
 const Stack = createStackNavigator();
 
 const Navigators = () => {

@@ -259,4 +259,37 @@ const cancelOrder = async ({ username, orderId }) => {
   }
 };
 
-module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder };
+const reOrder = async ({ username, orderId }) => {
+  try {
+    const orderObjectId = new ObjectId(orderId);
+
+    // Find the order
+    let order = await MongoDB.db
+      .collection(mongoConfig.collections.ORDERS)
+      .findOne({ _id: orderObjectId, username });
+
+    if (!order) {
+      return { status: false, message: "Order not found" };
+    }
+
+    // Remove existing cart items for the specified restaurant
+    await removeCartItems({ username, restaurantId: order.restaurantId });
+
+    // Insert the items from the order back into the cart collection
+    const cartItems = order.cartItems.map(item => ({
+      ...item,
+      username,
+      restaurantId: order.restaurantId,
+    }));
+
+    await MongoDB.db
+      .collection(mongoConfig.collections.CARTS)
+      .insertMany(cartItems);
+
+    return { status: true, message: "Reordered successfully" };
+  } catch (error) {
+    return { status: false, message: "Reordering failed", error };
+  }
+};
+
+module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder };
