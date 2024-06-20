@@ -124,6 +124,7 @@ const OrderHistoryScreen = ({ navigation }) => {
         <RestaurantOrderCard
           _id={item._id}
           name={item.restaurants.name}
+          restaurantId={item.restaurantId}
           date={item.createdAt}
           total={item.total}
           status={item.status}
