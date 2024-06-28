@@ -105,7 +105,7 @@ const AccountScreen = ({}) => {
           </View>
           <Text style={styles.menuText}>Offers {'&\n'} Promos</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>navigation.navigate('Location')} style={styles.menuItem} activeOpacity={0.8}>
+        <TouchableOpacity onPress={()=>navigation.navigate('DeliveryAddressesScreen')} style={styles.menuItem} activeOpacity={0.8}>
           <View
             style={{...styles.menuIcon, backgroundColor: Colors.LIGHT_YELLOW}}>
             <Ionicons

@@ -21,6 +21,9 @@ import {
   OrderHistoryScreen,
   OrderScreen,
   RestaurantScreen2,
+  ChangePasswordScreen,
+  DeliveryAddressesScreen,
+  NewAddressScreen,
 } from '../screens';
 import HomeTabs from './BottomTabs';
 import {useSelector, useDispatch} from 'react-redux';
@@ -76,6 +79,9 @@ const Navigators = () => {
             <Stack.Screen name="Order" component={OrderScreen}/>
             <Stack.Screen name="Location" component={LocationScreen}/>
             <Stack.Screen name="Restaurant2" component={RestaurantScreen2}/>
+            <Stack.Screen name="ChangePassword" component={ChangePasswordScreen}/>
+            <Stack.Screen name="DeliveryAddressesScreen" component={DeliveryAddressesScreen}/>
+            <Stack.Screen name ='NewAddressScreen' component={NewAddressScreen}/>
           </>
         )}
       </Stack.Navigator>

@@ -88,6 +88,7 @@ const LocationScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text>Hieu Ngu</Text>
       <Text style={styles.header}>Current Location</Text>
       {permissionGranted ? (
         location ? (

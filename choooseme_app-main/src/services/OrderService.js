@@ -214,5 +214,37 @@ const reOrder = async ({ username, orderId }) => {
     };
   }
 };
+const receivedOrder = async ({ username, orderId }) => {
+  console.log('OrderService | receivedOrder');
+  try {
+    let response = await axios.patch(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.ORDER}/received/${username}/${orderId}`,
+      null,
+      {
+        headers: authHeader(getToken()),
+      },
+    );
+    if (response?.status === 200) {
+      return {
+        status: true,
+        message: 'Order marked as received successfully',
+        data: response?.data?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Failed to mark order as received',
+      };
+    }
+  } catch (error) {
+    console.error('Error marking order as received:', error);
+    return {
+      status: false,
+      message: 'Failed to mark order as received',
+    };
+  }
+};
 
-export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder };
+export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder, receivedOrder };
+
+

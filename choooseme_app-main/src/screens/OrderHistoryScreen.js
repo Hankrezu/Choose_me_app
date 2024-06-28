@@ -7,7 +7,7 @@ StatusBar,
 FlatList,
 Image, // Import Image component
 TouchableOpacity
-} from 'react-native';``
+} from 'react-native';
 import { Colors, Fonts } from '../contants';
 import { Separator, RestaurantCart,RestaurantOrderCard } from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
