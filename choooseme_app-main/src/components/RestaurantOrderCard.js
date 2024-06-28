@@ -33,7 +33,6 @@ const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, 
       Alert.alert('Error', 'Failed to place order');
     }
   };
-
   const handleReceivedOrder = async () => {
     try {
       const response = await OrderService.receivedOrder({ username, orderId: _id });
@@ -46,7 +45,6 @@ const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, 
       Alert.alert('Error', 'Failed to mark order as received');
     }
   };
-
   return (
     <View>
       <View style={styles.container}>

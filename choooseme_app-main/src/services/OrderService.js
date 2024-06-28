@@ -214,7 +214,6 @@ const reOrder = async ({ username, orderId }) => {
     };
   }
 };
-
 const receivedOrder = async ({ username, orderId }) => {
   console.log('OrderService | receivedOrder');
   try {
@@ -247,4 +246,5 @@ const receivedOrder = async ({ username, orderId }) => {
 };
 
 export default { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder, receivedOrder };
+
 
