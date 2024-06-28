@@ -9,6 +9,11 @@ const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, 
   const handleCancelOrder = async () => {
     try {
       const response = await OrderService.cancelOrder({ username: username, orderId: _id });
+      if (response.status) {
+        Alert.alert('Success', 'Order canceled successfully');
+      } else {
+        Alert.alert('Error', response.message);
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to cancel order');
     }
@@ -19,13 +24,26 @@ const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, 
       const response = await OrderService.reOrder({ username, orderId: _id });
       if (response.status) {
         Alert.alert('Success', 'Order placed successfully', [
-          { text: 'OK'}
+          { text: 'OK' }
         ]);
       } else {
         Alert.alert('Error', response.message);
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to place order');
+    }
+  };
+
+  const handleReceivedOrder = async () => {
+    try {
+      const response = await OrderService.receivedOrder({ username, orderId: _id });
+      if (response.status) {
+        Alert.alert('Success', 'Order marked as received');
+      } else {
+        Alert.alert('Error', response.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to mark order as received');
     }
   };
 
@@ -52,6 +70,11 @@ const RestaurantOrderCard = ({ _id, restaurantId ,tags, total, status,username, 
         {status === 'PENDING' && (
           <TouchableOpacity style={styles.button} onPress={handleCancelOrder}>
             <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        {status === 'ONCOMING' && (
+          <TouchableOpacity style={styles.button} onPress={handleReceivedOrder}>
+            <Text style={styles.buttonText}>Received Order</Text>
           </TouchableOpacity>
         )}
         {(status === 'CANCELLED' || status === 'DELIVERED') && (

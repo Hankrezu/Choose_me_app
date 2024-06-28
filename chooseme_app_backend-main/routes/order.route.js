@@ -1,5 +1,5 @@
 var express = require("express");
-const { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder } = require("../services/order.service");
+const { getOrders, createOrder, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder ,receivedOrder} = require("../services/order.service");
 var router = express.Router();
 
 router.post("/:username", async (req, res) => {
@@ -42,6 +42,12 @@ router.patch("/cancel/:username/:orderId", async (req, res) => {
 router.post("/reorder/:username/:orderId", async (req, res) => {
   let { username, orderId } = req.params;
   let response = await reOrder({ username, orderId });
+  res.json(response);
+});
+
+router.patch("/received/:username/:orderId", async (req, res) => {
+  let { username, orderId } = req.params;
+  let response = await receivedOrder({ username, orderId });
   res.json(response);
 });
 

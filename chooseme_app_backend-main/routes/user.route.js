@@ -1,5 +1,5 @@
 var express = require("express");
-const { getUserData,  } = require("../services/user.service");
+const { getUserData, updateUserData, addAddress } = require("../services/user.service");
 var router = express.Router();
 
 router.get("/get-user", async (req, res) => {
@@ -8,35 +8,16 @@ router.get("/get-user", async (req, res) => {
   res.json(response);
 });
 
-router.patch("/update-user", async(req,res)=>{
+router.patch("/update-user", async (req, res) => {
+  const { username, email, phone } = req.body;
+  let response = await updateUserData(username, email, phone);
+  res.json(response);
+});
 
-})
-
-//Route Api cho viec cap nhap giu lieu nguoi dung
-router.patch("/update-user/:id",async(req, res) =>{
-  let {id}=req?.params;
-  let username = req?.username;
-  let respone = await updateUser({id,username});
-  res.json(respone);
-})
-
-
-//   res.send('Update by ID API')
-//   try {
-//     const id = req?.params.id;
-//     const updatedData = req.body;
-//     const options = { new: true };
-
-//     const result = await Model.findByIdAndUpdate(
-//         _id, updatedData, options
-//     )
-
-//     res.send(result)
-// }
-// catch (error) {
-//     res.status(400).json({ message: error.message })
-// }
-  
-// });
+router.post("/add-address", async (req, res) => {
+  const { username, address } = req.body;
+  let response = await addAddress(username, address);
+  res.json(response);
+});
 
 module.exports = router;

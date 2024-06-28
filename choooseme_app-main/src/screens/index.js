@@ -18,6 +18,9 @@ import LocationScreen from './LocationScreen';
 import OrderHistoryScreen from './OrderHistoryScreen';
 import OrderScreen from './OrderScreen';
 import RestaurantScreen2 from './RestauranScreen2';
+import ChangePasswordScreen from './ChangePasswordScreen';
+import DeliveryAddressesScreen from './DeliveryAddressesScreen';
+import NewAddressScreen from './NewAddressScreen';
 
 export {
   SplashScreen,
@@ -40,4 +43,7 @@ export {
   OrderHistoryScreen,
   OrderScreen,
   RestaurantScreen2,
+  ChangePasswordScreen,
+  DeliveryAddressesScreen,
+  NewAddressScreen,
 };

@@ -292,4 +292,36 @@ const reOrder = async ({ username, orderId }) => {
   }
 };
 
-module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder };
+const receivedOrder = async ({ username, orderId }) => {
+  try {
+    const orderObjectId = new ObjectId(orderId);
+    const result = await MongoDB.db
+      .collection(mongoConfig.collections.ORDERS)
+      .updateOne(
+        { _id: orderObjectId, username, status: 'ONCOMING' },
+        { $set: { status: 'DELIVERED' } }
+      );
+
+    if (result.modifiedCount > 0) {
+      return {
+        status: true,
+        message: "Order marked as delivered successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "Order status update failed or order was not in ONCOMING status",
+      };
+    }
+  } catch (error) {
+    console.error('Error marking order as delivered:', error);
+    return {
+      status: false,
+      message: "Order status update failed",
+      error,
+    };
+  }
+};
+
+module.exports = { createOrder, getOrders, removeCartItems, getOrderRestaurants, getOrderFoods, cancelOrder, reOrder, receivedOrder };
+

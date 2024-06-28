@@ -28,14 +28,6 @@ const ProfileScreen = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('Fetching address...');
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const HERE_API_KEY = 'N1VJJkJ75nlrnW3wBWj2iLlQadWYpHRo990Ur6r_yME';
-
-
 
   useEffect(()=>{
     const getData = async () => {
@@ -55,79 +47,7 @@ const ProfileScreen = () => {
     getData()
   },[]);
 
-  useEffect(() => {
-    const requestLocationPermission = async () => {
-      if (Platform.OS === 'android') {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-              title: "Location Access Required",
-              message: "This app needs to access your location",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log("Location permission granted");
-            setPermissionGranted(true);
-            getCurrentLocation();
-          } else {
-            console.log("Location permission denied");
-            setPermissionGranted(false);
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        // For iOS or other platforms
-        Geolocation.requestAuthorization();
-        setPermissionGranted(true);
-        getCurrentLocation();
-      }
-    };
-
-    const getCurrentLocation = () => {
-      Geolocation.getCurrentPosition(
-        position => {
-          setLocation(position);
-          fetchAddress(position.coords.latitude, position.coords.longitude);
-          setErrorMessage(null);
-        },
-        error => {
-          console.error(error);
-          setErrorMessage(error.message);
-        },
-        { enableHighAccuracy: true, timeout: 55000, maximumAge: 50000 }
-      );
-    };
-
-    const fetchAddress = async (latitude, longitude) => {
-      try {
-        const response = await axios.get(`https://revgeocode.search.hereapi.com/v1/revgeocode`, {
-          params: {
-            at: `${latitude},${longitude}`,
-            apiKey: HERE_API_KEY
-          }
-        });
-        if (response.data && response.data.items && response.data.items.length > 0) {
-          setAddress(truncate(response.data.items[0].address.label, 10));
-        } else {
-          setAddress("Address not found");
-        }
-      } catch (error) {
-        console.error(error);
-        setAddress("Error fetching address");
-      }
-    };
-
-    requestLocationPermission();
-  }, []);
-
-  const truncate = (input) => input.length > 30 ? `${input.substring(0, 30)}...` : input;
-  
-
+ 
   return (
   <View style={styles.container}>
   <StatusBar
@@ -148,10 +68,9 @@ const ProfileScreen = () => {
     />
     <Text style={styles.headerText}>Profile</Text>
     <View>  
-      <View>
-      </View>
     </View>
   </View>
+  
   <View style={styles.profileHeaderContainer}>
     <TouchableOpacity>
      <View style={styles.profileImageContainer}>
@@ -178,13 +97,14 @@ const ProfileScreen = () => {
         <Text style={styles.sectionText}>{username}</Text>
       </View>
       <Feather
+      onPress={()=>navigation.navigate('Modify')}
         name="edit-2"
         color={Colors.INACTIVE_GREY}
         size={24}
       />
     </TouchableOpacity>
 
-    <TouchableOpacity style={styles.sectionContainer} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.sectionContainer} activeOpacity={0.8} onPress={()=> navigation.navigate('ChangePassword')}>
       <View style={styles.sectionTextContainer}>
         <Feather
           name="lock"
@@ -224,22 +144,6 @@ const ProfileScreen = () => {
           color={Colors.PEACH}
         />
         <Text style={styles.sectionText}>{phoneNumber? phoneNumber :'Phone Number'}</Text>
-      </View>
-      <Feather
-        name="chevron-right"
-        color={Colors.INACTIVE_GREY}
-        size={24}
-      />
-    </TouchableOpacity>
-    
-    <TouchableOpacity style={styles.sectionContainer} activeOpacity={0.8}>
-      <View style={styles.sectionTextContainer}>
-        <Feather
-          name="map-pin"
-          size={24}
-          color={Colors.PEACH}
-        />
-        <Text style={styles.sectionText}>{address? address : 'Address'}</Text>
       </View>
       <Feather
         name="chevron-right"

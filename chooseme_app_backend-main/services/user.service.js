@@ -28,47 +28,62 @@ const getUserData = async (username) => {
   }
 };
 
-const infomationchange = async (username, phone) => {
+const updateUserData = async (username, email, phone) => {
   try {
-    let userObject = await MongoDB.db
+    const updateResult = await MongoDB.db
       .collection(mongoConfig.collections.USERS)
-      .findOne({ name: username }); // Querying by name
+      .updateOne(
+        { name: username },
+        { $set: { email: email, phone: phone } }
+      );
 
-    if (userObject) {
-      // Assuming you want to update the user's phone number
-      let updateResult = await MongoDB.db
-        .collection(mongoConfig.collections.USERS)
-        .updateOne({ name: username }, { $set: { phone: phone } });
-
-      if (updateResult.modifiedCount > 0) {
-        let updatedUser = await MongoDB.db
-          .collection(mongoConfig.collections.USERS)
-          .findOne({ name: username }); // Querying by name again to get the updated user
-
-        return {
-          status: true,
-          message: "User updated successfully",
-          data: updatedUser,
-        };
-      } else {
-        return {
-          status: false,
-          message: "User update failed or no changes made",
-        };
-      }
+    if (updateResult.matchedCount > 0) {
+      return {
+        status: true,
+        message: "User updated successfully",
+      };
     } else {
       return {
         status: false,
-        message: "No user found",
+        message: "No user found to update",
       };
     }
   } catch (error) {
     return {
       status: false,
-      message: "User finding failed",
-      error: `User finding failed: ${error?.message}`,
+      message: "User update failed",
+      error: `User update failed: ${error?.message}`,
     };
   }
 };
 
-module.exports = { getUserData, infomationchange };
+const addAddress = async (username, address) => {
+  try {
+    const updateResult = await MongoDB.db
+      .collection(mongoConfig.collections.USERS)
+      .updateOne(
+        { name: username },
+        { $push: { address: address } }
+      );
+
+    if (updateResult.matchedCount > 0) {
+      return {
+        status: true,
+        message: "Address added successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "No user found to add address",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: "Add address failed",
+      error: `Add address failed: ${error?.message}`,
+    };
+  }
+};
+
+module.exports = { getUserData, updateUserData, addAddress };
