@@ -12,6 +12,7 @@ import { Colors, Fonts } from '../contants';
 import { Separator, AddressCard} from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Display } from '../utils';
+import UserService from '../services/UserService';
 
 const DeliveryAddressesScreen = ({navigation}) => {
     const [addresses, setAddresses] = useState([]);
@@ -19,10 +20,10 @@ const DeliveryAddressesScreen = ({navigation}) => {
   
     useEffect(() => {
       const fetchAddresses = async () => {
-        const username = "someUsername"; // Replace with the actual username logic
-        const response = await UserService.getAddress(username);
+        const response = await UserService.getAddress();
         if (response.status) {
           setAddresses(response.data);
+          console.log(addresses)
         } else {
           console.log(response.message);
         }

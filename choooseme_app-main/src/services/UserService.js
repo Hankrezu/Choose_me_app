@@ -143,19 +143,19 @@ const getAddress = async (username) => {
       {
         params: { username },
         headers: authHeader(getToken()),
-      }
+      },
     );
 
     if (addressResponse?.status === 200) {
       return {
         status: true,
-        message: 'Address fetched successfully',
-        data: addressResponse?.data,
+        message: 'User addresses fetched successfully',
+        data: addressResponse?.data?.data,
       };
     } else {
       return {
         status: false,
-        message: 'Address fetching failed',
+        message: 'User addresses not found',
       };
     }
   } catch (error) {
@@ -163,7 +163,7 @@ const getAddress = async (username) => {
       status: false,
       message: error?.response?.data?.message
         ? error?.response?.data?.message
-        : 'Address fetching failed',
+        : 'User addresses retrieval failed',
     };
   }
 };

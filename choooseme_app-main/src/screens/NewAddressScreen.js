@@ -16,7 +16,6 @@ import UserService from '../services/UserService';
 
 const NewAddressScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [addressType, setAddressType] = useState('');
