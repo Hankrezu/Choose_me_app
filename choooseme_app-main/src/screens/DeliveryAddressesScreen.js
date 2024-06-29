@@ -9,80 +9,91 @@ Image, // Import Image component
 TouchableOpacity
 } from 'react-native';
 import { Colors, Fonts } from '../contants';
-import { Separator, RestaurantCart,RestaurantOrderCard } from '../components';
+import { Separator, AddressCard} from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Display } from '../utils';
 
-
 const DeliveryAddressesScreen = ({navigation}) => {
-  return (
-    <View style={styles.container}>
-       <StatusBar barStyle="dark-content" backgroundColor={Colors.PEACH} translucent />
-      <Separator height={StatusBar.currentHeight} />
-      <View style={styles.headerContainer}>
-        <Ionicons
-          name="chevron-back-outline"
-          size={30}
-          onPress={() => navigation.goBack()}
-        />
-        <Text style={styles.headerTitle}>Delivery Address</Text>
+    const [addresses, setAddresses] = useState([]);
+    const [loading, setLoading] = useState(true);
+  
+    useEffect(() => {
+      const fetchAddresses = async () => {
+        const username = "someUsername"; // Replace with the actual username logic
+        const response = await UserService.getAddress(username);
+        if (response.status) {
+          setAddresses(response.data);
+        } else {
+          console.log(response.message);
+        }
+        setLoading(false);
+      };
+      
+      fetchAddresses();
+    }, []);
+  
+    const renderAddressItem = ({ item }) => (
+      <AddressCard
+        name={item.name}
+        phone={item.phone}
+        address={item.address}
+        type={item.type}
+      />
+    );
+  
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor={Colors.PEACH} translucent />
+        <Separator height={StatusBar.currentHeight} />
+        <View style={styles.headerContainer}>
+          <Ionicons
+            name="chevron-back-outline"
+            size={30}
+            onPress={() => navigation.goBack()}
+          />
+          <Text style={styles.headerTitle}>Delivery Address</Text>
+        </View>
+  
+        <View style={styles.content}>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            <FlatList
+              data={addresses}
+              renderItem={renderAddressItem}
+              keyExtractor={(item) => item._id} // Assuming _id is a unique identifier
+            />
+          )}
+        </View>
+  
+        <TouchableOpacity style={styles.addAddressButton} onPress={() => navigation.navigate('NewAddressScreen')}>
+          <Text style={styles.addAddressButtonText}>Add New Address</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.content}>
-        {/* Other content goes here */}
-      </View>
-
-      <TouchableOpacity style={styles.addAddressButton} onPress={()=>navigation.navigate('NewAddressScreen')}>
-        <Text style={styles.addAddressButtonText}>Add New Address</Text>
-      </TouchableOpacity>
-    </View>
-  )
+    );
 }
 
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: Colors.DEFAULT_WHITE,
-    },
-    headerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      backgroundColor: Colors.PEACH,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontFamily: Fonts.POPPINS_MEDIUM,
-      lineHeight: 20 * 1.4,
-      width: '80%',
-      textAlign: 'center',
-    },
-    tabContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      backgroundColor: Colors.LIGHT_GREY,
-      paddingVertical: 10,
-    },
-    tabButton: {
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderBottomWidth: 3,
-      borderBottomColor: 'transparent',
-    },
-    activeTabButton: {
-      borderBottomColor: Colors.PEACH,
-    },
-    tabButtonText: {
-      fontSize: 16,
-      fontFamily: Fonts.POPPINS_MEDIUM,
-      color: Colors.DEFAULT_BLACK,
-    },
-    RestaurantCartList: {
-      marginHorizontal: 15,
-    },
-    content: {
+        flex: 1,
+        backgroundColor: Colors.DEFAULT_WHITE,
+      },
+      headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        backgroundColor: Colors.PEACH,
+      },
+      headerTitle: {
+        fontSize: 20,
+        fontFamily: Fonts.POPPINS_MEDIUM,
+        lineHeight: 20 * 1.4,
+        width: '80%',
+        textAlign: 'center',
+      },
+      content: {
         flex: 1,
         paddingHorizontal: 24,
       },

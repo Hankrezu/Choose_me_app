@@ -11,6 +11,7 @@ import BookmarkCard from './BookmarkCard';
 import FoodCard from './FoodCard';
 import RestaurantCart from './RestaurantCart';
 import RestaurantOrderCard from './RestaurantOrderCard';
+import AddressCard from './AddressCard';
 
 export {
   WelcomeCard,
@@ -26,4 +27,5 @@ export {
   FoodCard,
   RestaurantCart,
   RestaurantOrderCard,
+  AddressCard
 };

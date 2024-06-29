@@ -102,4 +102,70 @@ const addAddress = async (username, address) => {
   }
 };
 
-export default { getUserData, updateUserData, addAddress };
+const checkAddressExist = async (username, address) => {
+  console.log('UserService | checkAddressExist');
+  try {
+    let checkResponse = await axios.get(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.USER}/check-address-exist`,
+      {
+        params: { username, address },
+        headers: authHeader(getToken()),
+      }
+    );
+
+    if (checkResponse?.status === 200) {
+      return {
+        status: true,
+        message: 'Address check successful',
+        data: checkResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Address check failed',
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error?.response?.data?.message
+        ? error?.response?.data?.message
+        : 'Address check failed',
+    };
+  }
+};
+
+const getAddress = async (username) => {
+  console.log('UserService | getAddress');
+  try {
+    let addressResponse = await axios.get(
+      `${ApiContants.BACKEND_API.BASE_API_URL}${ApiContants.BACKEND_API.USER}/get-address`,
+      {
+        params: { username },
+        headers: authHeader(getToken()),
+      }
+    );
+
+    if (addressResponse?.status === 200) {
+      return {
+        status: true,
+        message: 'Address fetched successfully',
+        data: addressResponse?.data,
+      };
+    } else {
+      return {
+        status: false,
+        message: 'Address fetching failed',
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: error?.response?.data?.message
+        ? error?.response?.data?.message
+        : 'Address fetching failed',
+    };
+  }
+};
+
+export default { getUserData, updateUserData, addAddress, checkAddressExist, getAddress };

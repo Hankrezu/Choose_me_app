@@ -42,6 +42,12 @@ const NewAddressScreen = ({ navigation }) => {
     }
 
     try {
+      let checkResponse = await UserService.checkAddressExist(username, address);
+      if (checkResponse.status && checkResponse.data.status) {
+        Alert.alert('Error', 'Address already exists');
+        return;
+      }
+
       let response = await UserService.addAddress(username, {
         name: username,
         phone: phoneNumber,
