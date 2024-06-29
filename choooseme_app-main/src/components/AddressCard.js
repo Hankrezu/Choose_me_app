@@ -8,10 +8,10 @@ const AddressCard = ({ name, phone, address, type }) => {
     <View>
       <View style={styles.container}>
         <View style={styles.labelContainer}>
-          <Text style={styles.titleText}>Name: {name}</Text>
+          <Text style={styles.titleText}>Type: {type}</Text>
+          <Text style={styles.infoText}>Name: {name}</Text>
           <Text style={styles.infoText}>Phone: {phone}</Text>
-          <Text style={styles.infoText}>Address: {address}</Text>
-          <Text style={styles.infoText}>Type: {type}</Text>
+          <Text style={styles.infoText}>Address: {address}</Text>   
         </View>
       </View>
       <Separator height={5} />

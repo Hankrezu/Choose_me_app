@@ -15,8 +15,8 @@ router.patch("/update-user", async (req, res) => {
 });
 
 router.post("/add-address", async (req, res) => {
-  let username = req?.username;
-  let response = await addAddress(username);
+  const { username, address } = req.body; // Get username and address from request body
+  let response = await addAddress(username, address);
   res.json(response);
 });
 
