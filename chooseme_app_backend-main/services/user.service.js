@@ -86,4 +86,60 @@ const addAddress = async (username, address) => {
   }
 };
 
-module.exports = { getUserData, updateUserData, addAddress };
+const checkAddressExist = async (username, address) => {
+  try {
+    let userObject = await MongoDB.db
+      .collection(mongoConfig.collections.USERS)
+      .findOne({
+        name: username,
+        address: { $elemMatch: { address: address } },
+      });
+
+    if (userObject) {
+      return {
+        status: true,
+        message: "Address exists",
+      };
+    } else {
+      return {
+        status: false,
+        message: "Address does not exist",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: "Address check failed",
+      error: `Address check failed: ${error?.message}`,
+    };
+  }
+};
+
+const getAddress = async (username) => {
+  try {
+    let userObject = await MongoDB.db
+      .collection(mongoConfig.collections.USERS)
+      .findOne({ name: username }); // Querying by name
+
+    if (userObject) {
+      return {
+        status: true,
+        message: "User found successfully",
+        data: userObject.address,
+      };
+    } else {
+      return {
+        status: false,
+        message: "No user found",
+      };
+    }
+  } catch (error) {
+    return {
+      status: false,
+      message: "User finding failed",
+      error: `User finding failed: ${error?.message}`,
+    };
+  }
+};
+module.exports = { getUserData, updateUserData, addAddress, checkAddressExist, getAddress };
+
