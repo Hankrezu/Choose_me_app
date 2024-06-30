@@ -14,6 +14,7 @@ var bookmarkRouter = require("./routes/bookmark.route");
 var categoryRouter = require("./routes/category.route");
 var orderRouter = require("./routes/order.route");// Add orderRouter
 var SearchRouter = require("./routes/search.route")
+var reviewRouter = require("./routes/review.route")
 const MongoDB = require("./services/mongodb.service");
 
 MongoDB.connectToMongoDB();
@@ -40,8 +41,9 @@ app.use("/api/cart", cartRouter);
 app.use("/api/food", foodRouter);
 app.use("/api/bookmark", bookmarkRouter);
 app.use("/api/category", categoryRouter);
-app.use("/api/order", orderRouter);// add orderRouter
-app.use("/api/search", SearchRouter)
+app.use("/api/order", orderRouter);
+app.use("/api/search", SearchRouter);
+app.use("/api/review",reviewRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

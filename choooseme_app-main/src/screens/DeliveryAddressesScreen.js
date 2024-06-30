@@ -62,7 +62,7 @@ const DeliveryAddressesScreen = ({navigation}) => {
             <FlatList
               data={addresses}
               renderItem={renderAddressItem}
-              keyExtractor={(item) => item._id} // Assuming _id is a unique identifier
+              keyExtractor={(item) => item.address} 
             />
           )}
         </View>

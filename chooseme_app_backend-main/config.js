@@ -12,6 +12,7 @@ module.exports = {
       BOOKMARKS: "bookmarks",
       CATEGORIES: "categories",
       ORDERS: "orders",  // Ensure orders collection is included
+      REVIEWS:"reviews"
     },
   },
   serverConfig: {

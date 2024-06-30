@@ -1,0 +1,20 @@
+[
+    {
+        "username":"Hieu",
+        "foodid":"66605bef1ef7dda23255dd43",
+        "rate": 0,
+        "review":"",
+        "updatedAt": {
+            "$date": "2024-06-20T19:14:15.095Z"
+          }
+    },
+    {
+        "username":"Hieu",
+        "foodid":"667f880b64658b0fdbc51bde",
+        "rate": 0,
+        "review":"",
+        "updatedAt": {
+            "$date": "2024-06-20T19:14:15.095Z"
+          }
+    }
+]

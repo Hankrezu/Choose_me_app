@@ -1,0 +1,77 @@
+[{
+  "_id": {
+    "$oid": "6674241f13c1cf1a411840bc"
+  },
+  "foodId": "667170eef8e155bd0dad46ac",
+  "restaurantId": "666eb0b91c790eb2f2c2bca6",
+  "username": "Quan",
+  "count": 10,
+  "createdAt": {
+    "$date": "2024-06-20T12:44:15.346Z"
+  },
+  "updatedAt": {
+    "$date": "2024-06-20T19:14:15.095Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6674255c13c1cf1a411840fd"
+  },
+  "foodId": "667161856888a4bbf82d59cd",
+  "restaurantId": "666eb0b91c790eb2f2c2bca6",
+  "username": "Quan",
+  "count": 5,
+  "createdAt": {
+    "$date": "2024-06-20T12:49:32.326Z"
+  },
+  "updatedAt": {
+    "$date": "2024-06-20T19:15:26.588Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66771ba8cecd6dd1a771bd02"
+  },
+  "restaurantId": "666056ce1ef7dda23255dd2f",
+  "foodId": "66605bef1ef7dda23255dd3f",
+  "username": "Bin",
+  "count": 1
+},
+{
+  "_id": {
+    "$oid": "66771ba9cecd6dd1a771be4e"
+  },
+  "foodId": "66605bef1ef7dda23255dd42",
+  "restaurantId": "666056ce1ef7dda23255dd2f",
+  "username": "Bin",
+  "count": 2
+},
+{
+  "_id": {
+    "$oid": "66771c3ccecd6dd1a7724f5d"
+  },
+  "restaurantId": "666056ce1ef7dda23255dd2f",
+  "foodId": "66605bef1ef7dda23255dd3f",
+  "username": "Cong",
+  "count": 2
+},
+{
+  "_id": {
+    "$oid": "6673640ececd6dd1a78d228a"
+  },
+  "restaurantId": "666056ce1ef7dda23255dd31",
+  "username": "Hieu",
+  "foodId": "66605bef1ef7dda23255dd49",
+  "count": 4
+},
+{
+  "_id": {
+    "$oid": "6673640dcecd6dd1a78d212c"
+  },
+  "restaurantId": "666056ce1ef7dda23255dd31",
+  "username": "Hieu",
+  "foodId": "66605bef1ef7dda23255dd48",
+  "count": 2
+}]

@@ -18,7 +18,7 @@
   },
   "projectConfig": {
     "mongoConnectionUrl": "mongodb+srv://nhathieu1805:bon532528@cluster0.ktjozkq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    "serverIp": "192.168.1.8",
+    "serverIp": "192.168.1.10",
     "serverPort": "4000"
   }
 }
