@@ -21,6 +21,7 @@ import RestaurantScreen2 from './RestauranScreen2';
 import ChangePasswordScreen from './ChangePasswordScreen';
 import DeliveryAddressesScreen from './DeliveryAddressesScreen';
 import NewAddressScreen from './NewAddressScreen';
+import ReviewScreen from './ReviewScreen';
 
 export {
   SplashScreen,
@@ -46,4 +47,5 @@ export {
   ChangePasswordScreen,
   DeliveryAddressesScreen,
   NewAddressScreen,
+  ReviewScreen,
 };

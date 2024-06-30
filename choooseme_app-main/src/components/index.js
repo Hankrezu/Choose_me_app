@@ -12,7 +12,6 @@ import FoodCard from './FoodCard';
 import RestaurantCart from './RestaurantCart';
 import RestaurantOrderCard from './RestaurantOrderCard';
 import AddressCard from './AddressCard';
-
 export {
   WelcomeCard,
   Separator,
@@ -27,5 +26,5 @@ export {
   FoodCard,
   RestaurantCart,
   RestaurantOrderCard,
-  AddressCard
+  AddressCard,
 };

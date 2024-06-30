@@ -5,6 +5,7 @@ import {
   BookmarkScreen,
   CartScreen,
   HomeScreen,
+  ReviewScreen,
 } from '../screens';
 import { View, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -18,6 +19,8 @@ import SELECTED_HOMEICON from '../assets/SVG/SELECTED_HOMEICON';
 import BOOKMARKICON from '../assets/SVG/BOOKMARKICON';
 import SELECTED_CARTICON from '../assets/SVG/SELECTED_CARTICON';
 import CARTICON from '../assets/SVG/CARTICON';
+import SELECTED_REVIEWICON from '../assets/SVG/SELECTED_REVIEWICON';
+import REVIEWICON from '../assets/SVG/REVIEWICON';
 
 const BottomTabs = createBottomTabNavigator();
 export default () => (
@@ -59,6 +62,15 @@ export default () => (
       options={{
         tabBarIcon: ({ focused }) => (
           focused ? <SELECTED_CARTICON/>:<CARTICON/>
+        ),
+      }}
+    />
+        <BottomTabs.Screen
+      name="Review"
+      component={ReviewScreen}
+      options={{
+        tabBarIcon: ({ focused }) => (
+          focused ? <SELECTED_REVIEWICON/> : <REVIEWICON/>
         ),
       }}
     />

@@ -28,6 +28,7 @@ const BACKEND_API = {
   CATEGORY:'/category',
   GET_USER_DATA:'/user/get-user',
   ORDER:'/order',
+  REVIEW:'/review'
 };
 
 export default {COUNTRY_FLAG, BACKEND_API, STATIC_IMAGE};

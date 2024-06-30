@@ -7,6 +7,7 @@ import FoodService from './FoodService';
 import BookmarkService from './BookmarkService';
 import CategoryService from './CategoryService';
 import OrderService from './OrderService';
+import ReviewService from './ReviewService';
 
 export {
   StaticImageService,
@@ -18,4 +19,5 @@ export {
   BookmarkService,
   CategoryService,
   OrderService,
+  ReviewService,
 };
